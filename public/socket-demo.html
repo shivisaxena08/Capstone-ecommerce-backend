@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Socket.IO Demo - E-Commerce Notifications</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 760px; margin: 2rem auto; padding: 0 1rem; color: #1a1a1a; }
+    h1 { font-size: 1.4rem; }
+    .row { display: flex; gap: .5rem; flex-wrap: wrap; margin-bottom: .75rem; }
+    input { padding: .5rem; flex: 1; min-width: 180px; border: 1px solid #bbb; border-radius: 6px; }
+    button { padding: .5rem 1rem; border: 0; border-radius: 6px; background: #2563eb; color: #fff; cursor: pointer; }
+    button.secondary { background: #6b7280; }
+    #status { font-weight: 600; margin: .5rem 0; }
+    #log { background: #0f172a; color: #e2e8f0; padding: 1rem; border-radius: 8px; height: 360px; overflow: auto; font-family: ui-monospace, monospace; font-size: .85rem; }
+    .ev { color: #38bdf8; } .err { color: #f87171; }
+  </style>
+</head>
+<body>
+  <h1>Real-time notifications (Socket.IO)</h1>
+  <p>Log in as a <b>seller</b> (e.g. seller1@shop.com / Seller@123), connect, then place an order as a customer from Postman. You will see <code>order:new</code> and <code>stock:low</code> instantly.</p>
+  <div class="row">
+    <input id="email" placeholder="email" value="seller1@shop.com" />
+    <input id="password" type="password" placeholder="password" value="Seller@123" />
+  </div>
+  <div class="row">
+    <button id="connect">Login &amp; Connect</button>
+    <button id="disconnect" class="secondary">Disconnect</button>
+  </div>
+  <div id="status">Disconnected</div>
+  <div id="log"></div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const logEl = document.getElementById('log');
+    const statusEl = document.getElementById('status');
+    let socket;
+    const log = (html) => { logEl.insertAdjacentHTML('beforeend', `<div>${html}</div>`); logEl.scrollTop = logEl.scrollHeight; };
+    const esc = (s) => String(s).replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+
+    document.getElementById('connect').onclick = async () => {
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const res = await fetch('/api/auth/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }) });
+      const json = await res.json();
+      if (!json.success) return log(`<span class="err">Login failed: ${esc(json.message)}</span>`);
+      if (socket) socket.disconnect();
+      socket = io({ auth: { token: json.data.accessToken } }); // JWT is verified by the server on handshake
+      socket.on('connect', () => { statusEl.textContent = `Connected as ${json.data.user.name} (${json.data.user.role})`; });
+      socket.on('disconnect', () => { statusEl.textContent = 'Disconnected'; });
+      socket.on('connect_error', (e) => log(`<span class="err">Connection error: ${esc(e.message)}</span>`));
+      socket.onAny((event, payload) => log(`<span class="ev">${esc(event)}</span> ${esc(JSON.stringify(payload))}`));
+    };
+    document.getElementById('disconnect').onclick = () => socket && socket.disconnect();
+  </script>
+</body>
+</html>
