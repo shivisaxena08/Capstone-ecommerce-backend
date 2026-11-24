@@ -1,21 +1,17 @@
 # E-Commerce and Inventory Management System
 ## Backend Development - Capstone Project Report
 
-> Fill in the bracketed items, add screenshots where marked, then export to Word/PDF
-> (e.g. open in VS Code with the "Markdown PDF" extension, or paste into Word).
-
----
 
 ## 1. Cover Page and Team Details
 
 | | |
 | --- | --- |
-| Project title | E-Commerce and Inventory Management System |
-| Course | Backend Development |
+| Capstone Project | E-Commerce and Inventory Management System |
+| B.Tech. CSE (Ai Ml) | Backend Development |
 | Technology stack | Node.js, Express.js, MongoDB, Mongoose, JWT, bcrypt, Socket.IO |
-| Team members | [Name 1 - Roll No.], [Name 2 - Roll No.], [Name 3 - Roll No.] |
-| Faculty | [Name] |
-| Submission date | [Date] |
+| Done by | [Shivi Saxena - (2501730376)]|
+| Faculty | Mr. Vivek Singh |
+| Submission date | 22 November 2026 |
 
 ## 2. Abstract / Executive Summary
 This project is a RESTful backend for an online store. Customers browse products, manage a cart and place orders;
@@ -53,7 +49,7 @@ maintainability (MVC + service layer); performance (indexes, pagination, aggrega
 `Client -> Express Router -> Middleware (logger, auth, RBAC, Joi validation) -> Controller -> Service -> Mongoose Model -> MongoDB -> JSON response`.
 Errors from any layer reach the central `errorHandler`. Socket.IO shares the HTTP server; EventEmitter links services to notifications.
 
-[Insert architecture diagram here]
+![alt text](architecture_diagram.png)
 
 | Module | Files | Responsibility |
 | --- | --- | --- |
@@ -72,7 +68,7 @@ See `docs/DATABASE.md` for the full collection list, schemas, relationships and 
 Collections: users, categories, products, carts, orders. Indexes: unique email; text index on products; compound indexes
 `{seller, category}`, `{category, price}`; orders `{customer, createdAt}`, `{seller, status, createdAt}`, `{status, createdAt}`.
 
-[Insert ER diagram here]
+![alt text](er_diagram.png)
 
 ## 9. REST API Documentation
 See `docs/API.md` (all endpoints, roles, bodies, responses and error codes) and the Postman collection in `postman/`.
